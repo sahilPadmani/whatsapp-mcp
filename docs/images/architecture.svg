@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title>WhatsApp MCP architecture</title>
+  <rect width="900" height="560" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5b6b64"/>
+    </marker>
+  </defs>
+
+  <!-- External actors -->
+  <rect x="20" y="30" width="170" height="70" rx="10" fill="#eef4ff" stroke="#7aa2e3"/>
+  <text x="105" y="60" text-anchor="middle" font-size="15" font-weight="600" fill="#1d3b6e">AI agents</text>
+  <text x="105" y="80" text-anchor="middle" font-size="12" fill="#4a5f80">Claude Code, Cursor, …</text>
+
+  <rect x="20" y="130" width="170" height="70" rx="10" fill="#eef4ff" stroke="#7aa2e3"/>
+  <text x="105" y="160" text-anchor="middle" font-size="15" font-weight="600" fill="#1d3b6e">Your services</text>
+  <text x="105" y="180" text-anchor="middle" font-size="12" fill="#4a5f80">webhook receiver</text>
+
+  <rect x="20" y="440" width="170" height="80" rx="10" fill="#e9f7ef" stroke="#4fb37a"/>
+  <text x="105" y="472" text-anchor="middle" font-size="15" font-weight="600" fill="#1b5e3a">WhatsApp</text>
+  <text x="105" y="492" text-anchor="middle" font-size="12" fill="#3d7556">your phone, linked</text>
+  <text x="105" y="508" text-anchor="middle" font-size="12" fill="#3d7556">device via QR</text>
+
+  <!-- Server boundary -->
+  <rect x="240" y="15" width="640" height="530" rx="14" fill="#fafbfa" stroke="#c9d1cd" stroke-dasharray="6 4"/>
+  <text x="260" y="40" font-size="13" font-weight="600" fill="#5b6b64">whatsapp-mcp server (one Node.js process)</text>
+
+  <!-- Transport layer -->
+  <rect x="260" y="55" width="300" height="60" rx="8" fill="#fff" stroke="#9aa8a2"/>
+  <text x="410" y="80" text-anchor="middle" font-size="14" font-weight="600" fill="#22302a">mcp/  ·  http/</text>
+  <text x="410" y="99" text-anchor="middle" font-size="12" fill="#5b6b64">toolsets · sessions · /login · /mcp</text>
+
+  <rect x="575" y="55" width="285" height="60" rx="8" fill="#fff" stroke="#9aa8a2"/>
+  <text x="717" y="80" text-anchor="middle" font-size="14" font-weight="600" fill="#22302a">integrations/</text>
+  <text x="717" y="99" text-anchor="middle" font-size="12" fill="#5b6b64">signed webhooks + retry outbox</text>
+
+  <!-- Privacy guard -->
+  <rect x="260" y="130" width="600" height="40" rx="8" fill="#fff4e5" stroke="#e0a54b"/>
+  <text x="560" y="155" text-anchor="middle" font-size="13" font-weight="600" fill="#7a4d0b">privacy guard: no phone number or WhatsApp ID ever leaves the server</text>
+
+  <!-- Services -->
+  <rect x="260" y="185" width="600" height="70" rx="8" fill="#fff" stroke="#9aa8a2"/>
+  <text x="560" y="212" text-anchor="middle" font-size="14" font-weight="600" fill="#22302a">services/  (business logic)</text>
+  <text x="560" y="234" text-anchor="middle" font-size="12" fill="#5b6b64">chat resolver · chats · inbox (long-poll) · messaging (limits, typing, quotes) · media · status</text>
+
+  <!-- WhatsApp layer -->
+  <rect x="260" y="270" width="600" height="70" rx="8" fill="#fff" stroke="#9aa8a2"/>
+  <text x="560" y="297" text-anchor="middle" font-size="14" font-weight="600" fill="#22302a">whatsapp/  (Baileys adapter)</text>
+  <text x="560" y="319" text-anchor="middle" font-size="12" fill="#5b6b64">gateway interface · client (QR, reconnect) · ingest · parser · content builders</text>
+
+  <!-- Store -->
+  <rect x="260" y="355" width="600" height="70" rx="8" fill="#fff" stroke="#9aa8a2"/>
+  <text x="560" y="382" text-anchor="middle" font-size="14" font-weight="600" fill="#22302a">store/  (encrypted SQLite)</text>
+  <text x="560" y="404" text-anchor="middle" font-size="12" fill="#5b6b64">peers (UUID ↔ phone) · messages · reactions · session · media cache · outbox</text>
+
+  <!-- Core -->
+  <rect x="260" y="440" width="600" height="80" rx="8" fill="#f1f3f2" stroke="#9aa8a2"/>
+  <text x="560" y="470" text-anchor="middle" font-size="14" font-weight="600" fill="#22302a">core/  (reusable)</text>
+  <text x="560" y="492" text-anchor="middle" font-size="12" fill="#5b6b64">AES-256-GCM + HMAC · SQLite wrapper · typed event bus · rate limiter · uploads · errors</text>
+
+  <!-- Arrows -->
+  <line x1="190" y1="65" x2="256" y2="80" stroke="#5b6b64" stroke-width="1.6" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="219" y="62" font-size="11" fill="#5b6b64">MCP</text>
+  <path d="M717 55 V24 H212 V165 H194" fill="none" stroke="#5b6b64" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="196" y="215" font-size="11" fill="#5b6b64">webhooks</text>
+  <line x1="190" y1="480" x2="256" y2="305" stroke="#5b6b64" stroke-width="1.6" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="196" y="420" font-size="11" fill="#5b6b64">WhatsApp Web</text>
+  <text x="196" y="434" font-size="11" fill="#5b6b64">protocol</text>
+</svg>

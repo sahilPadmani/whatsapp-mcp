@@ -1,0 +1,18 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# Secrets and local data (WhatsApp session, encrypted DB, media cache)
+.env
+.env.*
+!.env.example
+data/
+*.db
+*.db-*
+
+# Logs and OS/editor files
+*.log
+.DS_Store
+.idea/
+.vscode/

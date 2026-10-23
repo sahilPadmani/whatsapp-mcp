@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>WhatsApp login</title>
+        <style>
+            :root {
+                --bg: #f4f5f3;
+                --card: #fff;
+                --text: #1b1f1d;
+                --muted: #66706b;
+                --line: #e3e6e3;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --bg: #101413;
+                    --card: #181d1b;
+                    --text: #e8ece9;
+                    --muted: #95a09a;
+                    --line: #29302d;
+                }
+            }
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: grid;
+                place-items: center;
+                padding: 16px;
+                background: var(--bg);
+                color: var(--text);
+                font:
+                    15px/1.5 system-ui,
+                    -apple-system,
+                    'Segoe UI',
+                    sans-serif;
+            }
+            main {
+                width: 100%;
+                max-width: 380px;
+                background: var(--card);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 24px;
+            }
+            .qr {
+                display: grid;
+                place-items: center;
+                background: #fff;
+                border-radius: 12px;
+                padding: 12px;
+                min-height: 200px;
+            }
+            .qr img {
+                width: 100%;
+                max-width: 300px;
+                image-rendering: pixelated;
+            }
+            ol {
+                color: var(--muted);
+                padding-left: 20px;
+                margin: 16px 0 0;
+            }
+            p.done {
+                font-size: 17px;
+                text-align: center;
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <main id="main">
+            <div class="qr"><img id="qr" alt="WhatsApp login QR code" hidden /><span id="wait">Loading QR…</span></div>
+            <ol>
+                <li>Open WhatsApp on your phone</li>
+                <li>Settings → Linked devices → Link a device</li>
+                <li>Scan this code</li>
+            </ol>
+        </main>
+        <script>
+            const done = () => {
+                document.getElementById('main').innerHTML = '<p class="done">WhatsApp is logged in.</p>';
+                window.close(); // only works if this tab was opened by a script; otherwise the message stays
+            };
+            const events = new EventSource(location.pathname.replace(/\/$/, '') + '/events');
+            events.onmessage = (e) => {
+                const s = JSON.parse(e.data);
+                if (s.state === 'open') {
+                    events.close();
+                    return done();
+                }
+                if (s.qr) {
+                    const img = document.getElementById('qr');
+                    img.src = s.qr;
+                    img.hidden = false;
+                    document.getElementById('wait').hidden = true;
+                }
+            };
+            // Link revoked or server restarted: reload to show the current status page.
+            events.onerror = () => setTimeout(() => location.reload(), 3000);
+        </script>
+    </body>
+</html>
