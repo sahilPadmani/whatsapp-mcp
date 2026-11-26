@@ -2,6 +2,12 @@
 
 All notable changes are listed here. The project follows [Semantic Versioning](https://semver.org).
 
+## [Unreleased]
+
+### Fixed
+
+- QR login failed with "Couldn't link device" (log: `failed to ack notification`): the WhatsApp Web version bundled with Baileys was outdated. The client now fetches the current version before connecting, and falls back to Baileys' default if that fails.
+
 ## [0.1.0] – 2026-10-23
 
 First public release.

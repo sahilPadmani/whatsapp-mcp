@@ -18,10 +18,12 @@
  */
 import makeWASocket, {
     DisconnectReason,
+    fetchLatestWaWebVersion,
     downloadMediaMessage,
     generateMessageIDV2,
     type AnyMessageContent,
     type ConnectionState as BaileysConnectionState,
+    type WAVersion,
     type WASocket,
 } from 'baileys';
 import pino from 'pino';
@@ -58,6 +60,7 @@ export class WhatsAppClient implements WhatsAppGateway {
     private retries = 0;
     private stopped = false;
     private reconnectTimer?: NodeJS.Timeout;
+    private waVersion?: WAVersion;
     private readonly baileysLogger;
 
     constructor(private readonly opts: WhatsAppClientOptions) {
@@ -71,7 +74,22 @@ export class WhatsAppClient implements WhatsAppGateway {
     /** Connects (showing a QR if there is no saved session). */
     async start() {
         this.stopped = false;
+        await this.refreshWaVersion();
         this.connect();
+    }
+
+    /**
+     * Baileys ships a fixed WhatsApp Web version that goes stale; WhatsApp then refuses QR
+     * pairing ("failed to ack notification", phone shows "Couldn't link device").
+     * Use the live version from web.whatsapp.com, falling back to Baileys' default.
+     */
+    private async refreshWaVersion() {
+        try {
+            const { version } = await fetchLatestWaWebVersion({});
+            if (Array.isArray(version) && version.length === 3) this.waVersion = version;
+        } catch {
+            // keep the last known version (or Baileys' default)
+        }
     }
 
     /** Disconnects without logging out; the session stays saved. */
@@ -161,6 +179,7 @@ export class WhatsAppClient implements WhatsAppGateway {
     private connect() {
         const { state: auth, saveCreds } = this.opts.auth.load();
         const sock = makeWASocket({
+            ...(this.waVersion ? { version: this.waVersion } : {}),
             auth,
             logger: this.baileysLogger,
             syncFullHistory: true,
